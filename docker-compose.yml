@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8
+    container_name: marketing_mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: marketing_analytics
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./sql/schema.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - pipeline_net
+
+  pipeline:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: dheeraj73/marketing-campaign-pipeline:latest
+    container_name: marketing_pipeline
+    restart: "no"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_NAME=marketing_analytics
+      - DB_USER=root
+      - DB_PASSWORD=root
+      - RAW_DATA_PATH=data/raw/campaign_data.csv
+      - PROCESSED_DATA_PATH=data/processed/campaign_data_cleaned.csv
+      - REJECTED_DATA_PATH=data/rejected/rejected_records.csv
+      - REPORTS_DIR=reports
+      - LOGS_DIR=logs
+    volumes:
+      - ./data:/app/data
+      - ./reports:/app/reports
+      - ./logs:/app/logs
+    networks:
+      - pipeline_net
+
+volumes:
+  mysql_data:
+
+networks:
+  pipeline_net:
+    driver: bridge
