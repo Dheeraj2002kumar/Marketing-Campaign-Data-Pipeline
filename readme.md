@@ -1,5 +1,7 @@
 # Marketing Campaign Data Pipeline
 
+[![Docker Hub](https://img.shields.io/badge/Docker%20Hub-dheeraj73%2Fmarketing--campaign--pipeline-blue?logo=docker)](https://hub.docker.com/repository/docker/dheeraj73/marketing-campaign-pipeline/general)
+
 A Python and SQL-based data engineering project that automates the extraction, cleaning, validation, storage, and analysis of marketing campaign data. The pipeline converts raw marketing data into reliable, structured datasets that support campaign performance measurement and business decision-making.
 
 ## 1. Project Overview
@@ -46,9 +48,9 @@ The objective is to build an automated pipeline that:
 | Requests | Optional REST API ingestion |
 | python-dotenv | Environment variable management |
 | Logging | Pipeline execution and error tracking |
-| Pytest | Automated testing |
 | Git and GitHub | Version control and project documentation |
-| Docker Compose | Optional reproducible MySQL environment |
+| Docker Compose | Reproducible multi-container environment (MySQL + Pipeline) |
+| Docker Hub | Container registry: [Dockerhub repository](https://hub.docker.com/repository/docker/dheeraj73/marketing-campaign-pipeline/general) |
 
 Use compatible versions of the selected libraries and record them in `requirements.txt`.
 
@@ -423,12 +425,32 @@ mysql -u your_database_user -p marketing_analytics < sql/schema.sql
 
 Replace the placeholder username with your configured database user.
 
-## 13. Running the Pipeline
+### Docker & Docker Hub Setup
 
-After implementing the application entry point:
+The complete pipeline and database stack is containerized and published on Docker Hub:
+- **Repository:** [Dockerhub repository](https://hub.docker.com/repository/docker/dheeraj73/marketing-campaign-pipeline/general)
+- **Image:** `dheeraj73/marketing-campaign-pipeline:latest`
+
+To run the entire system (MySQL 8 + Pipeline ETL) in isolated containers:
 
 ```bash
+# Pull the latest image from Docker Hub
+docker pull dheeraj73/marketing-campaign-pipeline:latest
+
+# Start MySQL database and run the pipeline
+docker compose up
+```
+
+## 13. Running the Pipeline
+
+### Option A: Local Virtual Environment
+```bash
 python main.py
+```
+
+### Option B: Docker Compose
+```bash
+docker compose up
 ```
 
 The pipeline should perform these steps:
@@ -565,7 +587,8 @@ The finished project should produce:
 
 ### Phase 6 — Optional Enhancements
 - [x] Add REST API ingestion (`extract_from_api` in `src/extract.py`).
-- [x] Add Docker Compose for local database setup (`docker-compose.yml`).
+- [x] Add Docker Compose for multi-container setup (`docker-compose.yml`).
+- [x] Containerize and publish image to [Dockerhub repository](https://hub.docker.com/repository/docker/dheeraj73/marketing-campaign-pipeline/general) (`dheeraj73/marketing-campaign-pipeline:latest`).
 - [x] Add interactive Jupyter Notebook for campaign analytics & visualizations (`notebooks/marketing_campaign_analysis.ipynb`).
 - [ ] Schedule recurring pipeline execution.
 - [ ] Add AWS or Snowflake integration.
